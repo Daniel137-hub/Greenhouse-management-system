@@ -1,45 +1,363 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-<title>Greenhouse Dashboard</title>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Smart Greenhouse Dashboard</title>
 
 <link rel="stylesheet" href="style.css">
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
 
 <body>
 
-<h1>Greenhouse Dashboard</h1>
+<header>
 
-<div class="cards">
+<h1>SMART GREENHOUSE MANAGEMENT SYSTEM</h1>
+
+<h3>Lettuce Growth Experiment</h3>
+
+</header>
+
+<!-- ========================= -->
+<!-- COMPARISON SECTION -->
+<!-- ========================= -->
+
+<section class="comparison">
+
+<div class="greenhouse">
+
+<h2>Greenhouse 1 (Smart)</h2>
 
 <div class="card">
-<h2>Temperature</h2>
-<p id="temp">0</p>
+Temperature
+<h3 id="g1Temp">0°C</h3>
 </div>
 
 <div class="card">
-<h2>Humidity</h2>
-<p id="hum">0</p>
+Humidity
+<h3 id="g1Hum">0%</h3>
 </div>
 
 <div class="card">
-<h2>Light</h2>
-<p id="light">0</p>
+Light
+<h3 id="g1Light">0 Lux</h3>
 </div>
 
 <div class="card">
-<h2>Soil Moisture</h2>
-<p id="soil">0</p>
+Soil Moisture
+<h3 id="g1Soil">0%</h3>
 </div>
 
 </div>
 
+<div class="greenhouse">
+
+<h2>Greenhouse 2 (Conventional)</h2>
+
+<div class="card">
+Temperature
+<h3 id="g2Temp">0°C</h3>
+</div>
+
+<div class="card">
+Humidity
+<h3 id="g2Hum">0%</h3>
+</div>
+
+<div class="card">
+Light
+<h3 id="g2Light">0 Lux</h3>
+</div>
+
+<div class="card">
+Soil Moisture
+<h3 id="g2Soil">0%</h3>
+</div>
+
+</div>
+
+</section>
+
+<!-- ========================= -->
+<!-- DEVICE STATUS -->
+<!-- ========================= -->
+
+<section>
+
+<h2>Device Status</h2>
+
+<div class="devices">
+
+<div class="device">
+Fan
+<span id="fanStatus">OFF</span>
+</div>
+
+<div class="device">
+Heater
+<span id="heaterStatus">OFF</span>
+</div>
+
+<div class="device">
+Pump
+<span id="pumpStatus">OFF</span>
+</div>
+
+<div class="device">
+LED
+<span id="ledStatus">OFF</span>
+</div>
+
+<div class="device">
+Vent
+<span id="ventStatus">CLOSED</span>
+</div>
+
+</div>
+
+</section>
+
+<!-- ========================= -->
+<!-- MANUAL CONTROL -->
+<!-- ========================= -->
+
+<section>
+
+<h2>Manual Control</h2>
+
+<div class="controls">
+
+<button onclick="toggleFan()">
+Toggle Fan
+</button>
+
+<button onclick="toggleHeater()">
+Toggle Heater
+</button>
+
+<button onclick="togglePump()">
+Toggle Pump
+</button>
+
+<button onclick="toggleLED()">
+Toggle LED
+</button>
+
+</div>
+
+</section>
+
+<!-- ========================= -->
+<!-- CHARTS -->
+<!-- ========================= -->
+
+<section>
+
+<h2>Temperature Comparison</h2>
+
+<canvas id="tempChart"></canvas>
+
+</section>
+
+<section>
+
+<h2>Humidity Comparison</h2>
+
+<canvas id="humChart"></canvas>
+
+</section>
+
+<section>
+
+<h2>Light Comparison</h2>
+
+<canvas id="lightChart"></canvas>
+
+</section>
+
+<section>
+
+<h2>Soil Moisture Comparison</h2>
+
+<canvas id="soilChart"></canvas>
+
+</section>
+
+<!-- ========================= -->
+<!-- GROWTH DATA -->
+<!-- ========================= -->
+
+<section>
+
+<h2>Lettuce Growth Records</h2>
+
+<table id="growthTable">
+
+<thead>
+
+<tr>
+
+<th>Week</th>
+
+<th>GH1 Height</th>
+
+<th>GH2 Height</th>
+
+<th>GH1 Leaves</th>
+
+<th>GH2 Leaves</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+
+<td>1</td>
+<td id="h1w1">-</td>
+<td id="h2w1">-</td>
+<td id="l1w1">-</td>
+<td id="l2w1">-</td>
+
+</tr>
+
+<tr>
+
+<td>2</td>
+<td id="h1w2">-</td>
+<td id="h2w2">-</td>
+<td id="l1w2">-</td>
+<td id="l2w2">-</td>
+
+</tr>
+
+<tr>
+
+<td>3</td>
+<td id="h1w3">-</td>
+<td id="h2w3">-</td>
+<td id="l1w3">-</td>
+<td id="l2w3">-</td>
+
+</tr>
+
+<tr>
+
+<td>4</td>
+<td id="h1w4">-</td>
+<td id="h2w4">-</td>
+<td id="l1w4">-</td>
+<td id="l2w4">-</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</section>
+
+<!-- ========================= -->
+<!-- HISTORICAL DATA -->
+<!-- ========================= -->
+
+<section>
+
+<h2>Historical Records</h2>
+
+<button onclick="exportCSV()">
+Export CSV
+</button>
+
+<table id="historyTable">
+
+<thead>
+
+<tr>
+
+<th>Time</th>
+<th>Temperature</th>
+<th>Humidity</th>
+<th>Light</th>
+<th>Soil</th>
+
+</tr>
+
+</thead>
+
+<tbody id="historyBody">
+
+</tbody>
+
+</table>
+
+</section>
+
+<!-- ========================= -->
+<!-- RESEARCH INDICATORS -->
+<!-- ========================= -->
+
+<section>
+
+<h2>Performance Indicators</h2>
+
+<div class="indicator">
+
+Temperature Stability Index
+
+<h3 id="tsi">0%</h3>
+
+</div>
+
+<div class="indicator">
+
+Water Use Efficiency
+
+<h3 id="wue">0</h3>
+
+</div>
+
+<div class="indicator">
+
+Yield Increase
+
+<h3 id="yieldIncrease">0%</h3>
+
+</div>
+
+<div class="indicator">
+
+Water Saving
+
+<h3 id="waterSaving">0%</h3>
+
+</div>
+
+</section>
+
+<footer>
+
+<p>
+Greenhouse Monitoring System
+ESP32 + Firebase + JavaScript
+</p>
+
+</footer>
+
+<script src="firebase-config.js"></script>
 <script src="app.js"></script>
 
 </body>
